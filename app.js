@@ -19,7 +19,7 @@ function addData() {
 
   // Validar campos de entrada
   if (name === '' || date === '' || price === '' || category === '') {
-    alert('Por favor, complete todos los campos');
+    alertM('Por favor, complete todos los campos', "danger");
     return;
   }
 
@@ -68,6 +68,7 @@ function addData() {
 
   // Guardar datos en el Local Storage
   saveDataToLocalStorage();
+  alertM("Producto creado o actualizado correctamente", "success")
 }
 
 // Función para eliminar datos
@@ -76,6 +77,7 @@ function deleteData(event) {
   table.removeChild(row);
 
   // Guardar datos actualizados en el Local Storage
+  alertM("Producto eliminado correctamente", "danger")
   saveDataToLocalStorage();
 }
 
@@ -105,6 +107,8 @@ function editData(event) {
   // Guardar datos actualizados en el Local Storage
   saveDataToLocalStorage();
 }
+
+
 
 // Función para buscar datos
 function searchData() {
@@ -229,3 +233,21 @@ function loadStoredData() {
     }
   }
 }
+//FUNCION PARA MOSTRAR ALERTAS
+function alertM(message, cssClass) {
+    const div = document.createElement("div");
+    div.className = `alert alert-${cssClass} mt-2`;
+    div.appendChild(document.createTextNode(message));
+
+    //MOSTRAR EN EL DOM
+    const container = document.querySelector(".container");
+    const app = document.querySelector("#App");
+
+    //INSERTAR EL MENSAJE
+    container.insertBefore(div, app);
+
+    //REMOVER ALERTA LUEGO DE 4 SEGUNDOS
+    setTimeout(function () {
+      document.querySelector(".alert").remove();
+    }, 4000);
+} 
