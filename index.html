@@ -13,7 +13,7 @@
     <div class="container">
         <div class="App" id="App">
             <div class="container mt-4">
-                <h2 class="mb-4">POO</h2>
+                <h2 class="mb-4">CRUD App</h2>
                 <div class="row">
                     <div class="col-md-4">
                         <form>
@@ -34,10 +34,12 @@
                                 <input type="text" class="form-control" id="cate" placeholder="Categoría">
                             </div>
                             <button type="button" class="btn btn-primary" onclick="addData()">Agregar/Actualizar</button>
+                            <button type="button" class="btn btn-success" onclick="exportData()">Backup</button>
+                            <button type="button" class="btn btn-warning" onclick="importData()">Restore</button>
                         </form>
                     </div>
                     <div class="col-md-8">
-                        <div class="form-group">
+                        <div class="form-group"><br>
                             <input type="text" class="form-control" id="search" placeholder="Buscar..." onkeyup="searchData()">
                         </div>
                         <table class="table table-striped">
@@ -55,10 +57,9 @@
                     </div>
                 </div>
             </div>
+            <script src="app.js"></script>
         </div>
     </div>
-
-    <script src="app.js"></script>
 </body>
 
 </html>
