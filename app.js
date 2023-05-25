@@ -231,97 +231,110 @@ function loadStoredData() {
 }
 
 // Función para exportar los datos en formato JSON
-function exportDataToJSON() {
-  const rows = table.getElementsByTagName('tr');
-  const data = [];
-
-  // Recorrer las filas de la tabla y guardar los datos en un arreglo
-  for (let i = 1; i < rows.length; i++) {
-    const name = rows[i].cells[0].textContent;
-    const date = rows[i].cells[1].textContent;
-    const price = rows[i].cells[2].textContent;
-    const category = rows[i].cells[3].textContent;
-
-    data.push({
-      name,
-      date,
-      price,
-      category,
-    });
-  }
-
-  // Crear un enlace de descarga
-  const jsonData = JSON.stringify(data);
-  const blob = new Blob([jsonData], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'inventory.json';
-  a.click();
-}
-
-// Función para importar los datos en formato JSON
-function importDataFromJSON(event) {
-  const file = event.target.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function (e) {
-    const contents = e.target.result;
-    const data = JSON.parse(contents);
-
-    // Crear filas y celdas para cada dato importado
-    for (let i = 0; i < data.length; i++) {
-      const newRow = document.createElement('tr');
-      const nameCell = document.createElement('td');
-      const dateCell = document.createElement('td');
-      const priceCell = document.createElement('td');
-      const cateCell = document.createElement('td');
-      const actionsCell = document.createElement('td');
-
-      nameCell.textContent = data[i].name;
-      dateCell.textContent = data[i].date;
-      priceCell.textContent = data[i].price;
-      cateCell.textContent = data[i].category;
-
-      const deleteButton = document.createElement('button');
-      deleteButton.textContent = 'Eliminar';
-      deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'mr-1');
-      deleteButton.addEventListener('click', deleteData);
-
-      const editButton = document.createElement('button');
-      editButton.textContent = 'Editar';
-      editButton.classList.add('btn', 'btn-primary', 'btn-sm');
-      editButton.addEventListener('click', editData);
-
-      actionsCell.appendChild(deleteButton);
-      actionsCell.appendChild(editButton);
-
-      newRow.appendChild(nameCell);
-      newRow.appendChild(dateCell);
-      newRow.appendChild(priceCell);
-      newRow.appendChild(cateCell);
-      newRow.appendChild(actionsCell);
-
-      table.appendChild(newRow);
-    }
-
-    // Guardar datos importados en el Local Storage
-    saveDataToLocalStorage();
-  };
-
-  reader.readAsText(file);
-}
-
-// Función para exportar los datos en formato JSON al hacer clic en el botón de Backup
 function exportData() {
-  exportDataToJSON();
-}
-
-// Función para importar los datos en formato JSON al hacer clic en el botón de Restore
-function importData() {
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.accept = 'application/json';
-  fileInput.addEventListener('change', importDataFromJSON);
-  fileInput.click();
-}
+    const rows = table.getElementsByTagName('tr');
+    const data = [];
+  
+    // Recorrer las filas de la tabla y guardar los datos en un arreglo
+    for (let i = 1; i < rows.length; i++) {
+      const name = rows[i].cells[0].textContent;
+      const date = rows[i].cells[1].textContent;
+      const price = rows[i].cells[2].textContent;
+      const category = rows[i].cells[3].textContent;
+  
+      data.push({
+        name,
+        date,
+        price,
+        category,
+      });
+    }
+  
+    // Convertir el arreglo a JSON
+    const jsonData = JSON.stringify(data);
+  
+    // Crear un enlace de descarga
+    const downloadLink = document.createElement('a');
+    downloadLink.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(jsonData));
+    downloadLink.setAttribute('download', 'backup.json');
+    downloadLink.style.display = 'none';
+  
+    // Agregar el enlace al documento y simular el clic para descargar el archivo
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+  }
+  
+  // Función para importar datos desde un archivo JSON
+  function importData() {
+    const fileInput = document.createElement('input');
+    fileInput.setAttribute('type', 'file');
+    fileInput.style.display = 'none';
+  
+    fileInput.addEventListener('change', function(event) {
+      const file = event.target.files[0];
+      const reader = new FileReader();
+  
+      reader.onload = function(e) {
+        const contents = e.target.result;
+  
+        try {
+          const data = JSON.parse(contents);
+  
+          // Limpiar la tabla actual
+          while (table.rows.length > 1) {
+            table.deleteRow(1);
+          }
+  
+          // Crear filas y celdas para cada dato importado
+          for (let i = 0; i < data.length; i++) {
+            const newRow = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            const dateCell = document.createElement('td');
+            const priceCell = document.createElement('td');
+            const cateCell = document.createElement('td');
+            const actionsCell = document.createElement('td');
+  
+            nameCell.textContent = data[i].name;
+            dateCell.textContent = data[i].date;
+            priceCell.textContent = data[i].price;
+            cateCell.textContent = data[i].category;
+  
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar';
+            deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'mr-1');
+            deleteButton.addEventListener('click', deleteData);
+  
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Editar';
+            editButton.classList.add('btn', 'btn-primary', 'btn-sm');
+            editButton.addEventListener('click', editData);
+  
+            actionsCell.appendChild(deleteButton);
+            actionsCell.appendChild(editButton);
+  
+            newRow.appendChild(nameCell);
+            newRow.appendChild(dateCell);
+            newRow.appendChild(priceCell);
+            newRow.appendChild(cateCell);
+            newRow.appendChild(actionsCell);
+  
+            table.appendChild(newRow);
+          }
+  
+          // Guardar datos importados en el Local Storage
+          saveDataToLocalStorage();
+        } catch (error) {
+          alert('Error al importar los datos. Asegúrese de seleccionar un archivo JSON válido.');
+        }
+      };
+  
+      reader.readAsText(file);
+    });
+  
+    // Simular el clic en el campo de entrada de archivo
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    document.body.removeChild(fileInput);
+  }
+  
