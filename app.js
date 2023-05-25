@@ -108,51 +108,51 @@ function editData(event) {
 
 // Función para buscar datos
 function searchData() {
-    const searchValue = document.getElementById('search').value.toLowerCase();
-    const rows = table.getElementsByTagName('tr');
-  
-    // Recorrer las filas de la tabla y mostrar u ocultar según la búsqueda
-    for (let i = 1; i < rows.length; i++) {
-      const nameCell = rows[i].cells[0];
-      const priceCell = rows[i].cells[2];
-      const cateCell = rows[i].cells[3];
-      const dateCell = rows[i].cells[1];
-  
-      const name = nameCell.textContent.toLowerCase();
-      const price = priceCell.textContent;
-      const category = cateCell.textContent.toLowerCase();
-      const date = dateCell.textContent;
-  
-      let match = false;
-  
-      // Búsqueda por nombre
-      if (name.includes(searchValue)) {
-        match = true;
-      }
-  
-      // Búsqueda por precio (incluyendo valores iguales)
-      if (price === searchValue) {
-        match = true;
-      }
-  
-      // Búsqueda por categoría
-      if (category.includes(searchValue)) {
-        match = true;
-      }
-  
-      // Búsqueda por fecha de venta
-      if (date === searchValue) {
-        match = true;
-      }
-  
-      if (match) {
-        rows[i].style.display = '';
-      } else {
-        rows[i].style.display = 'none';
-      }
+  const searchValue = document.getElementById('search').value.toLowerCase();
+  const rows = table.getElementsByTagName('tr');
+
+  // Recorrer las filas de la tabla y mostrar u ocultar según la búsqueda
+  for (let i = 1; i < rows.length; i++) {
+    const nameCell = rows[i].cells[0];
+    const priceCell = rows[i].cells[2];
+    const cateCell = rows[i].cells[3];
+    const dateCell = rows[i].cells[1];
+
+    const name = nameCell.textContent.toLowerCase();
+    const price = priceCell.textContent;
+    const category = cateCell.textContent.toLowerCase();
+    const date = dateCell.textContent;
+
+    let match = false;
+
+    // Búsqueda por nombre
+    if (name.includes(searchValue)) {
+      match = true;
+    }
+
+    // Búsqueda por precio (incluyendo valores iguales)
+    if (price === searchValue) {
+      match = true;
+    }
+
+    // Búsqueda por categoría
+    if (category.includes(searchValue)) {
+      match = true;
+    }
+
+    // Búsqueda por fecha de venta
+    if (date === searchValue) {
+      match = true;
+    }
+
+    if (match) {
+      rows[i].style.display = '';
+    } else {
+      rows[i].style.display = 'none';
     }
   }
-  
+}
+
 // Función para limpiar los campos de entrada
 function clearInputFields() {
   nameInput.value = '';
@@ -228,4 +228,100 @@ function loadStoredData() {
       table.appendChild(newRow);
     }
   }
+}
+
+// Función para exportar los datos en formato JSON
+function exportDataToJSON() {
+  const rows = table.getElementsByTagName('tr');
+  const data = [];
+
+  // Recorrer las filas de la tabla y guardar los datos en un arreglo
+  for (let i = 1; i < rows.length; i++) {
+    const name = rows[i].cells[0].textContent;
+    const date = rows[i].cells[1].textContent;
+    const price = rows[i].cells[2].textContent;
+    const category = rows[i].cells[3].textContent;
+
+    data.push({
+      name,
+      date,
+      price,
+      category,
+    });
+  }
+
+  // Crear un enlace de descarga
+  const jsonData = JSON.stringify(data);
+  const blob = new Blob([jsonData], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'inventory.json';
+  a.click();
+}
+
+// Función para importar los datos en formato JSON
+function importDataFromJSON(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    const contents = e.target.result;
+    const data = JSON.parse(contents);
+
+    // Crear filas y celdas para cada dato importado
+    for (let i = 0; i < data.length; i++) {
+      const newRow = document.createElement('tr');
+      const nameCell = document.createElement('td');
+      const dateCell = document.createElement('td');
+      const priceCell = document.createElement('td');
+      const cateCell = document.createElement('td');
+      const actionsCell = document.createElement('td');
+
+      nameCell.textContent = data[i].name;
+      dateCell.textContent = data[i].date;
+      priceCell.textContent = data[i].price;
+      cateCell.textContent = data[i].category;
+
+      const deleteButton = document.createElement('button');
+      deleteButton.textContent = 'Eliminar';
+      deleteButton.classList.add('btn', 'btn-danger', 'btn-sm', 'mr-1');
+      deleteButton.addEventListener('click', deleteData);
+
+      const editButton = document.createElement('button');
+      editButton.textContent = 'Editar';
+      editButton.classList.add('btn', 'btn-primary', 'btn-sm');
+      editButton.addEventListener('click', editData);
+
+      actionsCell.appendChild(deleteButton);
+      actionsCell.appendChild(editButton);
+
+      newRow.appendChild(nameCell);
+      newRow.appendChild(dateCell);
+      newRow.appendChild(priceCell);
+      newRow.appendChild(cateCell);
+      newRow.appendChild(actionsCell);
+
+      table.appendChild(newRow);
+    }
+
+    // Guardar datos importados en el Local Storage
+    saveDataToLocalStorage();
+  };
+
+  reader.readAsText(file);
+}
+
+// Función para exportar los datos en formato JSON al hacer clic en el botón de Backup
+function exportData() {
+  exportDataToJSON();
+}
+
+// Función para importar los datos en formato JSON al hacer clic en el botón de Restore
+function importData() {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = 'application/json';
+  fileInput.addEventListener('change', importDataFromJSON);
+  fileInput.click();
 }
